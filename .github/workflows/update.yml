@@ -1,24 +1,36 @@
-name: Update Configs Daily
+name: Update V2ray Configs
 
 on:
   schedule:
-    - cron: '0 */3 * * *'
-  workflow_dispatch:
+    - cron: '0 */1 * * *' # این یعنی هر 1 ساعت یکبار چک میکند و آپدیت میکند
+  workflow_dispatch: # این دکمه دستی برای آپدیت فوری است
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # اجازه نوشتن در فایل را میدهد
+      
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      - run: pip install requests
-      - run: python scraper.py
-      - run: |
-          git config --global user.name "Auto Bot"
-          git config --global user.email "bot@gmail.com"
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Run Scraper
+        run: python scraper.py
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
           git add yasin.txt
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update configs" && git push)
+          git commit -m "🚀 Auto-update configs from Telegram" || exit 0
+          git push
