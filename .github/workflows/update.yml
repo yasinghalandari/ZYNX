@@ -1,18 +1,19 @@
-name: Update V2ray Configs
+name: Hourly Vless Scraper
 
 on:
   schedule:
-    - cron: '0 */1 * * *' # این یعنی هر 1 ساعت یکبار چک میکند و آپدیت میکند
-  workflow_dispatch: # این دکمه دستی برای آپدیت فوری است
+    - cron: '0 * * * *' # اجرا هر ساعت (دقیقه صفر)
+  workflow_dispatch: # دکمه اجرای دستی
+
+permissions:
+  contents: write
 
 jobs:
-  build:
+  scrape_and_update:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # اجازه نوشتن در فایل را میدهد
-      
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -22,6 +23,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install requests beautifulsoup4
 
       - name: Run Scraper
@@ -31,6 +33,6 @@ jobs:
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          git add yasin.txt
-          git commit -m "🚀 Auto-update configs from Telegram" || exit 0
-          git push
+          git add yasin.text
+          # فقط اگر تغییر جدیدی بود کامیت کن
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Add new vless configs" && git push)
