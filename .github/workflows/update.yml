@@ -1,9 +1,12 @@
-herename: Hourly Vless Scraper
+name: Hourly Vless Scraper
 
 on:
   schedule:
-    - cron: '0 * * * *' # اجرا سر هر ساعت
-  workflow_dispatch: # قابلیت اجرای دستی
+    - cron: '1 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -30,6 +33,5 @@ jobs:
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          git add yasin.txt
-          # خط زیر بررسی میکند اگر تغییری بود کامیت کند، وگرنه پیام دهد و ارور نگیرد
-          git diff-index --quiet HEAD || (git commit -m "Updated configs from Telegram" && git push)
+          git add yasin.text
+          git diff-index --quiet HEAD || (git commit -m "Updated configs" && git push)
