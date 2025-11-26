@@ -1,19 +1,18 @@
-hereimport requests
+import requests
 from bs4 import BeautifulSoup
-import re
 import os
 
 # آدرس کانال تلگرام (نسخه وب)
 url = "https://t.me/s/prrofile_purple"
 
-# فایل خروجی
-output_file = "yasin.txt"
+# نام فایلی که خواسته بودید
+output_file = "yasin.text"
 
 def scrape_telegram():
     print(f"Checking {url} ...")
     
     try:
-        # دریافت محتوای سایت با هدر مناسب برای جلوگیری از بلاک شدن
+        # تنظیمات مرورگر برای اینکه تلگرام ما را ربات تشخیص ندهد
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
@@ -22,7 +21,7 @@ def scrape_telegram():
         
         soup = BeautifulSoup(response.text, 'html.parser')
         
-        # پیدا کردن باکس پیام‌های تلگرام
+        # پیدا کردن متن پیام‌ها
         messages = soup.find_all('div', class_='tgme_widget_message_text')
         
         found_configs = []
@@ -30,30 +29,34 @@ def scrape_telegram():
         # کلیدواژه‌هایی که دنبالشان هستیم
         keywords = ["vless://", "vmess://", "ss://", "trojan://", "tuic://", "hysteria2://"]
 
-        # بررسی پیام‌ها (از جدید به قدیم یا برعکس مهم نیست چون همش سیو میشه)
+        # بررسی پیام‌ها
         for msg in messages:
-            text = msg.get_text(separator="\n") # دریافت متن پیام
+            text = msg.get_text(separator="\n")
             
-            # چک می‌کنیم آیا یکی از کلیدواژه‌ها داخل متن هست؟
+            # اگر یکی از کلیدواژه‌ها داخل متن بود، کل متن را بردار
             if any(key in text for key in keywords):
-                # اضافه کردن خط جداکننده برای خوانایی بهتر
                 found_configs.append("--------------------------------------------------")
                 found_configs.append(text)
                 found_configs.append("--------------------------------------------------\n")
 
-        # اگر کانفیگی پیدا شد، در فایل ذخیره کن
+        # ذخیره در فایل yasin.text
         if found_configs:
+            # حالت 'w' یعنی هر بار فایل قبلی پاک شود و جدیدها نوشته شود
+            # اگر می‌خواهید به قبلی‌ها اضافه شود، 'w' را به 'a' تغییر دهید
             with open(output_file, "w", encoding="utf-8") as f:
                 f.write("\n".join(found_configs))
-            print(f"Success! {len(found_configs)//3} configs saved to {output_file}")
+            print(f"Success! configs saved to {output_file}")
         else:
-            print("No configs found in the last messages.")
-            # اگر می‌خواهید حتی در صورت پیدا نشدن فایل خالی شود، خط زیر را فعال کنید:
-            # open(output_file, "w").close()
+            print("No configs found.")
+            # ساخت فایل خالی برای جلوگیری از ارور
+            if not os.path.exists(output_file):
+                open(output_file, "w").close()
 
     except Exception as e:
-        print(f"Error occurred: {e}")
-        exit(1)
+        print(f"Error: {e}")
+        # ساخت فایل خالی در صورت ارور برای جلوگیری از شکستن ورک‌فلو
+        if not os.path.exists(output_file):
+            open(output_file, "w").close()
 
 if __name__ == "__main__":
     scrape_telegram()
