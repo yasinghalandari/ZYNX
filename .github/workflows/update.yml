@@ -2,7 +2,7 @@ name: Hourly Vless Scraper
 
 on:
   schedule:
-    - cron: '0 * * * *' # اجرا هر ساعت (دقیقه صفر)
+    - cron: '1 * * * *' # اجرا هر ساعت (دقیقه صفر)
   workflow_dispatch: # دکمه اجرای دستی
 
 permissions:
